@@ -1,5 +1,11 @@
 # 🎫 Support Ticket Management System (HelpDesk Pro)
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-2ea44f?style=for-the-badge&logo=github)](https://mvenkatahemanthreddy.github.io/Project/)
+
+**Live Deployment URL:** **[https://mvenkatahemanthreddy.github.io/Project/](https://mvenkatahemanthreddy.github.io/Project/)**
+
+---
+
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7+-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org/)
 [![Express.js](https://img.shields.io/badge/Express.js-4.21-lightgrey.svg)](https://expressjs.com/)
