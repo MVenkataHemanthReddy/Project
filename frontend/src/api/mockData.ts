@@ -156,3 +156,43 @@ export const INITIAL_TICKETS: Ticket[] = [
     _count: { comments: 0, activityLogs: 0 },
   },
 ];
+
+export const INITIAL_NOTIFICATIONS: Notification[] = [
+  {
+    id: 'notif-1',
+    userId: 'user-admin',
+    ticketId: 'ticket-2',
+    type: 'TICKET_CREATED',
+    title: 'Urgent Ticket Submitted',
+    message: 'High priority ticket #1002 has been created in TECHNICAL.',
+    isRead: false,
+    createdAt: new Date(Date.now() - 3600000 * 3).toISOString(),
+  },
+  {
+    id: 'notif-2',
+    userId: 'user-john',
+    ticketId: 'ticket-1',
+    type: 'TICKET_UPDATED',
+    title: 'Ticket Response',
+    message: 'Sarah Connor replied to your ticket #1001.',
+    isRead: true,
+    createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
+  },
+];
+
+export const INITIAL_EMAILS: SimulatedEmail[] = [
+  {
+    id: 'email-1',
+    to: 'john@example.com',
+    subject: '[Ticket #1001] Status changed to IN_PROGRESS',
+    body: 'Hi John,\n\nYour ticket #1001 status has been updated to IN_PROGRESS by Sarah Connor.',
+    sentAt: new Date(Date.now() - 3600000 * 7).toISOString(),
+  },
+  {
+    id: 'email-2',
+    to: 'support@helpdesk.com',
+    subject: '[New Ticket #1002] Unable to connect to WebSocket in EU-Central region',
+    body: 'New URGENT ticket #1002 created by Alice Smith.\n\nDescription: Connection resets on wss://stream.api.internal:8443.',
+    sentAt: new Date(Date.now() - 3600000 * 12).toISOString(),
+  },
+];
