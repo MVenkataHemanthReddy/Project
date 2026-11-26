@@ -1,0 +1,92 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              String         @id @default(uuid())
+  email           String         @unique
+  name            String
+  password        String
+  role            String         @default("USER") // USER | ADMIN
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  tickets         Ticket[]       @relation("UserTickets")
+  assignedTickets Ticket[]       @relation("AssignedTickets")
+  comments        Comment[]
+  activityLogs    ActivityLog[]  @relation("ActorActivity")
+  notifications   Notification[]
+
+  @@map("users")
+}
+
+model Ticket {
+  id           String        @id @default(uuid())
+  ticketNumber Int           @unique
+  title        String
+  description  String
+  category     String        @default("GENERAL") // TECHNICAL | BILLING | ACCOUNT | FEATURE_REQUEST | GENERAL
+  priority     String        @default("MEDIUM")  // LOW | MEDIUM | HIGH | URGENT
+  status       String        @default("OPEN")    // OPEN | IN_PROGRESS | RESOLVED | CLOSED
+  userId       String
+  assignedToId String?
+  resolvedAt   DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  user         User          @relation("UserTickets", fields: [userId], references: [id], onDelete: Cascade)
+  assignedTo   User?         @relation("AssignedTickets", fields: [assignedToId], references: [id], onDelete: SetNull)
+  comments     Comment[]
+  activityLogs ActivityLog[]
+
+  @@map("tickets")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  ticketId  String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  ticketId  String
+  actorId   String?
+  action    String   // TICKET_CREATED | TICKET_UPDATED | STATUS_CHANGED | PRIORITY_CHANGED | COMMENT_ADDED | TICKET_RESOLVED | TICKET_ASSIGNED
+  details   String
+  metadata  String?  // JSON string
+  createdAt DateTime @default(now())
+
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  actor     User?    @relation("ActorActivity", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@map("activity_logs")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  ticketId  String?
+  type      String   // TICKET_CREATED | STATUS_CHANGED | COMMENT_ADDED | TICKET_RESOLVED | TICKET_ASSIGNED
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}

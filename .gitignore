@@ -1,0 +1,25 @@
+# Node
+node_modules/
+dist/
+build/
+.npm
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+
+# Databases & local logs
+*.db
+*.db-journal
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
