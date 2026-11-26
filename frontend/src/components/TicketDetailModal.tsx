@@ -12,12 +12,9 @@ import {
   Send,
   Trash2,
   Edit2,
-  CheckCircle2,
-  UserCheck,
   AlertCircle,
   Loader2,
-  Calendar,
-  Tag,
+  CornerDownLeft,
 } from 'lucide-react';
 
 interface TicketDetailModalProps {
@@ -44,11 +41,9 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
-  const [editPriority, setEditPriority] = useState<Priority>('MEDIUM');
-  const [editCategory, setEditCategory] = useState<Category>('GENERAL');
   const [savingEdit, setSavingEdit] = useState(false);
 
-  // Tab state (Comments vs Event Audit Trail)
+  // Tab state
   const [activeTab, setActiveTab] = useState<'comments' | 'history'>('comments');
 
   useEffect(() => {
@@ -64,8 +59,6 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
           setTicket(res.data.data);
           setEditTitle(res.data.data.title);
           setEditDescription(res.data.data.description);
-          setEditPriority(res.data.data.priority);
-          setEditCategory(res.data.data.category);
         }
       } catch (err: any) {
         if (isMounted) {
@@ -84,7 +77,6 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
 
   if (!ticketId) return null;
 
-  // Handler: Add comment
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim() || !ticket) return;
@@ -104,22 +96,18 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
       setNewComment('');
       onTicketUpdated();
     } catch (err: any) {
-      alert(err.response?.data?.error || 'Failed to post comment.');
+      alert(err.response?.data?.error || 'Failed to post response.');
     } finally {
       setSubmittingComment(false);
     }
   };
 
-  // Handler: Update status (Admin only)
   const handleStatusChange = async (newStatus: TicketStatus) => {
     if (!ticket) return;
     try {
-      const res = await api.patch(`/tickets/${ticket.id}`, {
-        status: newStatus,
-      });
+      const res = await api.patch(`/tickets/${ticket.id}`, { status: newStatus });
       setTicket((prev) => (prev ? { ...prev, status: newStatus, resolvedAt: res.data.data.resolvedAt } : null));
       onTicketUpdated();
-      // Refetch ticket to refresh audit trail
       const fresh = await api.get(`/tickets/${ticket.id}`);
       setTicket(fresh.data.data);
     } catch (err: any) {
@@ -127,7 +115,6 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
     }
   };
 
-  // Handler: Update priority (Admin or owner)
   const handlePriorityChange = async (newPriority: Priority) => {
     if (!ticket) return;
     try {
@@ -141,7 +128,6 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
     }
   };
 
-  // Handler: Save edit
   const handleSaveEdit = async () => {
     if (!ticket) return;
     setSavingEdit(true);
@@ -149,8 +135,6 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
       const res = await api.patch(`/tickets/${ticket.id}`, {
         title: editTitle.trim(),
         description: editDescription.trim(),
-        priority: editPriority,
-        category: editCategory,
       });
       setTicket((prev) => (prev ? { ...prev, ...res.data.data } : null));
       setIsEditing(false);
@@ -164,10 +148,9 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
     }
   };
 
-  // Handler: Delete ticket
   const handleDelete = async () => {
     if (!ticket) return;
-    if (!window.confirm(`Are you sure you want to delete Ticket #${ticket.ticketNumber}?`)) {
+    if (!window.confirm(`Delete Ticket #${ticket.ticketNumber}?`)) {
       return;
     }
 
@@ -186,12 +169,12 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
   const canDelete = isAdmin || (isOwner && ticket?.status === 'OPEN');
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden">
-        {/* Modal Top Bar */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
-          <div className="flex items-center gap-3">
-            <span className="font-mono font-bold text-sm bg-slate-200 text-slate-800 px-2 py-0.5 rounded">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-zinc-950/40 backdrop-blur-sm animate-in fade-in duration-150">
+      <div className="bg-white rounded-2xl shadow-2xl border border-zinc-200/90 w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
+        {/* Top Header */}
+        <div className="px-6 py-3.5 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50">
+          <div className="flex items-center gap-2.5">
+            <span className="font-mono text-xs font-medium text-zinc-400">
               #{ticket?.ticketNumber || '...'}
             </span>
             {ticket && (
@@ -202,11 +185,11 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
               </div>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             {canDelete && (
               <button
                 onClick={handleDelete}
-                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                className="p-1.5 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors"
                 title="Delete ticket"
               >
                 <Trash2 className="w-4 h-4" />
@@ -214,114 +197,91 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
             )}
             <button
               onClick={onClose}
-              className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-lg transition-colors"
+              className="p-1.5 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 rounded-md transition-colors"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Content Area */}
+        {/* Content Body */}
         {loading ? (
-          <div className="flex-1 p-12 flex flex-col items-center justify-center text-slate-400">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-3" />
-            <p className="text-sm">Loading ticket details...</p>
+          <div className="flex-1 p-12 flex flex-col items-center justify-center text-zinc-400 text-xs">
+            <Loader2 className="w-6 h-6 animate-spin text-zinc-800 mb-2" />
+            <span>Loading ticket details...</span>
           </div>
         ) : error ? (
-          <div className="flex-1 p-8 text-center text-rose-600 text-sm flex flex-col items-center justify-center">
-            <AlertCircle className="w-10 h-10 mb-2" />
+          <div className="flex-1 p-8 text-center text-rose-600 text-xs flex flex-col items-center justify-center">
+            <AlertCircle className="w-8 h-8 mb-2" />
             <p>{error}</p>
           </div>
         ) : ticket ? (
-          <div className="flex-1 overflow-y-auto grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
-            {/* Left 2 Cols: Main Info, Comments & Timeline */}
+          <div className="flex-1 overflow-y-auto grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-zinc-200/80">
+            {/* Left 2 Cols: Main Content & Timeline */}
             <div className="lg:col-span-2 p-6 flex flex-col space-y-6">
-              {/* Title & Description */}
+              {/* Subject & Description */}
               {isEditing ? (
-                <div className="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                      Editing Ticket
-                    </span>
-                    <button
-                      onClick={() => setIsEditing(false)}
-                      className="text-xs text-slate-500 hover:text-slate-700"
-                    >
-                      Cancel
-                    </button>
-                  </div>
+                <div className="space-y-3 bg-zinc-50 p-4 rounded-xl border border-zinc-200">
                   <input
                     type="text"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    className="w-full px-3 py-1.5 text-sm rounded border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-xs rounded border border-zinc-300 focus:outline-none focus:ring-1 focus:ring-zinc-900 font-medium"
                   />
                   <textarea
                     rows={4}
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
-                    className="w-full px-3 py-1.5 text-sm rounded border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-1.5 text-xs rounded border border-zinc-300 focus:outline-none focus:ring-1 focus:ring-zinc-900"
                   />
-                  <div className="flex justify-end gap-2 pt-2">
+                  <div className="flex justify-end gap-2 pt-1">
                     <button
                       onClick={() => setIsEditing(false)}
-                      className="px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-200 rounded"
+                      className="px-3 py-1 text-xs text-zinc-600 hover:bg-zinc-200 rounded"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleSaveEdit}
                       disabled={savingEdit}
-                      className="px-4 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded shadow-sm disabled:opacity-50"
+                      className="px-3 py-1 text-xs font-medium text-white bg-zinc-900 rounded disabled:opacity-50"
                     >
-                      {savingEdit ? 'Saving...' : 'Save Changes'}
+                      {savingEdit ? 'Saving...' : 'Save'}
                     </button>
                   </div>
                 </div>
               ) : (
-                <div>
+                <div className="space-y-3">
                   <div className="flex items-start justify-between gap-3">
-                    <h1 className="text-lg sm:text-xl font-bold text-slate-900 leading-tight">
+                    <h2 className="text-base sm:text-lg font-semibold text-zinc-900 tracking-tight leading-snug">
                       {ticket.title}
-                    </h1>
+                    </h2>
                     {canEdit && (
                       <button
                         onClick={() => setIsEditing(true)}
-                        className="p-1 text-slate-400 hover:text-blue-600 rounded hover:bg-slate-100 transition-colors"
-                        title="Edit ticket"
+                        className="p-1 text-zinc-400 hover:text-zinc-800 rounded hover:bg-zinc-100 transition-colors"
+                        title="Edit title or description"
                       >
-                        <Edit2 className="w-4 h-4" />
+                        <Edit2 className="w-3.5 h-3.5" />
                       </button>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-3 text-xs text-slate-500 mt-2">
-                    <span className="flex items-center gap-1">
-                      <UserCheck className="w-3.5 h-3.5" />
-                      {ticket.user?.name}
-                    </span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {new Date(ticket.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-
-                  <div className="mt-4 p-4 rounded-xl bg-slate-50 border border-slate-100 text-slate-700 text-sm whitespace-pre-wrap leading-relaxed">
+                  <div className="p-4 rounded-xl bg-zinc-50/70 border border-zinc-100 text-zinc-700 text-xs whitespace-pre-wrap leading-relaxed">
                     {ticket.description}
                   </div>
                 </div>
               )}
 
-              {/* Tab Navigation: Comments vs Activity Audit Log */}
-              <div className="border-t border-slate-100 pt-4">
-                <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+              {/* Segmented Tabs: Responses vs Audit History */}
+              <div className="border-t border-zinc-100 pt-4 flex-1 flex flex-col">
+                <div className="flex items-center gap-1.5 bg-zinc-100 p-0.5 rounded-lg text-xs font-medium text-zinc-600 self-start mb-4">
                   <button
                     onClick={() => setActiveTab('comments')}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md transition-all ${
                       activeTab === 'comments'
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'text-slate-500 hover:text-slate-800'
+                        ? 'bg-white text-zinc-900 font-semibold shadow-sm'
+                        : 'text-zinc-600 hover:text-zinc-900'
                     }`}
                   >
                     <MessageSquare className="w-3.5 h-3.5" />
@@ -329,24 +289,24 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
                   </button>
                   <button
                     onClick={() => setActiveTab('history')}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md transition-all ${
                       activeTab === 'history'
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'text-slate-500 hover:text-slate-800'
+                        ? 'bg-white text-zinc-900 font-semibold shadow-sm'
+                        : 'text-zinc-600 hover:text-zinc-900'
                     }`}
                   >
                     <History className="w-3.5 h-3.5" />
-                    <span>Event Audit Trail ({ticket.activityLogs?.length || 0})</span>
+                    <span>Audit Trail ({ticket.activityLogs?.length || 0})</span>
                   </button>
                 </div>
 
-                {/* Tab: Comments Thread */}
+                {/* Responses Tab */}
                 {activeTab === 'comments' && (
-                  <div className="mt-4 space-y-4">
-                    <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                  <div className="space-y-4 flex-1 flex flex-col justify-between">
+                    <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
                       {ticket.comments?.length === 0 ? (
-                        <p className="text-center py-6 text-slate-400 text-xs">
-                          No responses on this ticket yet. Start the conversation below.
+                        <p className="text-center py-6 text-zinc-400 text-xs">
+                          No responses recorded yet.
                         </p>
                       ) : (
                         ticket.comments?.map((comment) => (
@@ -354,35 +314,29 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
                             key={comment.id}
                             className={`p-3.5 rounded-xl border text-xs ${
                               comment.user?.role === 'ADMIN'
-                                ? 'bg-purple-50/50 border-purple-100'
-                                : 'bg-white border-slate-200'
+                                ? 'bg-zinc-50/80 border-zinc-200'
+                                : 'bg-white border-zinc-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.02)]'
                             }`}
                           >
                             <div className="flex items-center justify-between mb-1.5">
                               <div className="flex items-center gap-2">
-                                <span className="font-semibold text-slate-800">
+                                <span className="font-semibold text-zinc-900">
                                   {comment.user?.name}
                                 </span>
-                                <span
-                                  className={`text-[9px] font-bold px-1.5 py-0.2 rounded uppercase ${
-                                    comment.user?.role === 'ADMIN'
-                                      ? 'bg-purple-200 text-purple-800'
-                                      : 'bg-slate-200 text-slate-700'
-                                  }`}
-                                >
-                                  {comment.user?.role}
-                                </span>
+                                {comment.user?.role === 'ADMIN' && (
+                                  <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-zinc-200 text-zinc-800">
+                                    Support Staff
+                                  </span>
+                                )}
                               </div>
-                              <span className="text-[10px] text-slate-400">
+                              <span className="text-[10px] text-zinc-400 font-mono">
                                 {new Date(comment.createdAt).toLocaleTimeString([], {
                                   hour: '2-digit',
                                   minute: '2-digit',
-                                  month: 'short',
-                                  day: 'numeric',
                                 })}
                               </span>
                             </div>
-                            <p className="text-slate-700 whitespace-pre-wrap leading-relaxed">
+                            <p className="text-zinc-700 whitespace-pre-wrap leading-relaxed">
                               {comment.content}
                             </p>
                           </div>
@@ -390,7 +344,7 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
                       )}
                     </div>
 
-                    {/* New Comment Input */}
+                    {/* Reply Input */}
                     <form onSubmit={handleAddComment} className="pt-2 flex gap-2">
                       <input
                         type="text"
@@ -398,20 +352,20 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
                         onChange={(e) => setNewComment(e.target.value)}
                         placeholder={
                           isAdmin
-                            ? 'Reply as Admin (notifies customer)...'
-                            : 'Add a message or update on your ticket...'
+                            ? 'Reply as support administrator...'
+                            : 'Write a response or provide additional details...'
                         }
-                        className="flex-1 px-3.5 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 placeholder:text-slate-400"
+                        className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-zinc-200 bg-white focus:outline-none focus:ring-1 focus:ring-zinc-900 placeholder:text-zinc-400"
                       />
                       <button
                         type="submit"
                         disabled={submittingComment || !newComment.trim()}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm disabled:opacity-50 transition-all shrink-0"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 rounded-lg shadow-sm disabled:opacity-40 transition-all shrink-0"
                       >
                         {submittingComment ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
                         ) : (
-                          <Send className="w-3.5 h-3.5" />
+                          <CornerDownLeft className="w-3.5 h-3.5" />
                         )}
                         <span>Reply</span>
                       </button>
@@ -419,35 +373,33 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
                   </div>
                 )}
 
-                {/* Tab: Event Audit Trail */}
+                {/* Audit Trail Tab */}
                 {activeTab === 'history' && (
-                  <div className="mt-4 space-y-3 max-h-80 overflow-y-auto">
+                  <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
                     {ticket.activityLogs?.length === 0 ? (
-                      <p className="text-center py-6 text-slate-400 text-xs">
-                        No events logged yet.
+                      <p className="text-center py-6 text-zinc-400 text-xs">
+                        No activity recorded.
                       </p>
                     ) : (
                       ticket.activityLogs?.map((log) => (
                         <div
                           key={log.id}
-                          className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 border border-slate-100 text-xs"
+                          className="flex items-start gap-2.5 p-2.5 rounded-lg bg-zinc-50 border border-zinc-100 text-xs"
                         >
-                          <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0" />
-                          <div className="flex-1">
+                          <div className="w-1.5 h-1.5 rounded-full bg-zinc-400 mt-1.5 shrink-0" />
+                          <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
-                              <span className="font-semibold text-slate-800">
+                              <span className="font-medium text-zinc-900">
                                 {log.action.replace('_', ' ')}
                               </span>
-                              <span className="text-[10px] text-slate-400">
-                                {new Date(log.createdAt).toLocaleString([], {
-                                  month: 'short',
-                                  day: 'numeric',
+                              <span className="text-[10px] text-zinc-400 font-mono">
+                                {new Date(log.createdAt).toLocaleTimeString([], {
                                   hour: '2-digit',
                                   minute: '2-digit',
                                 })}
                               </span>
                             </div>
-                            <p className="text-slate-600 mt-0.5">{log.details}</p>
+                            <p className="text-[11px] text-zinc-500 mt-0.5">{log.details}</p>
                           </div>
                         </div>
                       ))
@@ -457,95 +409,86 @@ export const TicketDetailModal: React.FC<TicketDetailModalProps> = ({
               </div>
             </div>
 
-            {/* Right 1 Col: Management & Metadata Panel */}
-            <div className="p-6 bg-slate-50/50 space-y-6">
-              {/* Status Controller */}
+            {/* Right 1 Col: Meta Inspector Sidebar */}
+            <div className="p-6 bg-zinc-50/40 space-y-5 text-xs">
+              {/* Status Picker */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
-                  Ticket Status
-                </label>
+                <span className="text-[11px] font-medium uppercase tracking-wider text-zinc-400 block mb-1.5">
+                  Status
+                </span>
                 {isAdmin ? (
-                  <div className="space-y-1.5">
-                    {(['OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'] as TicketStatus[]).map((st) => (
-                      <button
-                        key={st}
-                        onClick={() => handleStatusChange(st)}
-                        className={`w-full px-3 py-2 text-xs font-medium rounded-lg border text-left flex items-center justify-between transition-all ${
-                          ticket.status === st
-                            ? 'bg-white border-blue-500 ring-2 ring-blue-500/20 text-blue-700 shadow-sm'
-                            : 'bg-white/60 border-slate-200 text-slate-600 hover:bg-white'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <StatusBadge status={st} />
-                        </div>
-                        {ticket.status === st && <CheckCircle2 className="w-4 h-4 text-blue-600" />}
-                      </button>
-                    ))}
-                  </div>
+                  <select
+                    value={ticket.status}
+                    onChange={(e) => handleStatusChange(e.target.value as TicketStatus)}
+                    className="w-full px-2.5 py-1.5 text-xs rounded-md border border-zinc-200 bg-white font-medium focus:ring-1 focus:ring-zinc-900 cursor-pointer"
+                  >
+                    <option value="OPEN">Open</option>
+                    <option value="IN_PROGRESS">In Progress</option>
+                    <option value="RESOLVED">Resolved</option>
+                    <option value="CLOSED">Closed</option>
+                  </select>
                 ) : (
-                  <div className="p-3 bg-white rounded-lg border border-slate-200">
-                    <StatusBadge status={ticket.status} size="md" />
-                    <p className="text-[11px] text-slate-400 mt-2">
-                      Status is managed by helpdesk administrators.
-                    </p>
-                  </div>
+                  <StatusBadge status={ticket.status} size="md" />
                 )}
               </div>
 
-              {/* Priority Controller */}
+              {/* Priority Picker */}
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+                <span className="text-[11px] font-medium uppercase tracking-wider text-zinc-400 block mb-1.5">
                   Priority
-                </label>
+                </span>
                 {isAdmin ? (
                   <select
                     value={ticket.priority}
                     onChange={(e) => handlePriorityChange(e.target.value as Priority)}
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white font-medium focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-2.5 py-1.5 text-xs rounded-md border border-zinc-200 bg-white font-medium focus:ring-1 focus:ring-zinc-900 cursor-pointer"
                   >
                     <option value="LOW">Low</option>
                     <option value="MEDIUM">Medium</option>
                     <option value="HIGH">High</option>
-                    <option value="URGENT">Urgent 🔥</option>
+                    <option value="URGENT">Urgent</option>
                   </select>
                 ) : (
-                  <div className="p-2.5 bg-white rounded-lg border border-slate-200">
-                    <PriorityBadge priority={ticket.priority} />
-                  </div>
+                  <PriorityBadge priority={ticket.priority} />
                 )}
               </div>
 
-              {/* Ticket Details Summary */}
-              <div className="border-t border-slate-200 pt-4 space-y-3 text-xs">
+              {/* Metadata Details */}
+              <div className="pt-4 border-t border-zinc-200/80 space-y-3">
                 <div>
-                  <span className="text-slate-400 block text-[11px]">Submitted by</span>
-                  <span className="font-semibold text-slate-800">{ticket.user?.name}</span>
-                  <span className="text-slate-500 block text-[11px]">{ticket.user?.email}</span>
+                  <span className="text-zinc-400 text-[10px] uppercase tracking-wider block">Customer</span>
+                  <span className="font-medium text-zinc-800 block mt-0.5">{ticket.user?.name}</span>
+                  <span className="text-zinc-400 text-[11px]">{ticket.user?.email}</span>
                 </div>
 
                 <div>
-                  <span className="text-slate-400 block text-[11px]">Assigned Agent</span>
-                  <span className="font-semibold text-slate-800">
-                    {ticket.assignedTo?.name || 'Unassigned (General Pool)'}
+                  <span className="text-zinc-400 text-[10px] uppercase tracking-wider block">Assignee</span>
+                  <span className="text-zinc-600 block mt-0.5">
+                    {ticket.assignedTo?.name || 'Unassigned'}
+                  </span>
+                </div>
+
+                <div>
+                  <span className="text-zinc-400 text-[10px] uppercase tracking-wider block">Created</span>
+                  <span className="text-zinc-600 font-mono text-[11px] block mt-0.5">
+                    {new Date(ticket.createdAt).toLocaleString([], {
+                      dateStyle: 'medium',
+                      timeStyle: 'short',
+                    })}
                   </span>
                 </div>
 
                 {ticket.resolvedAt && (
                   <div>
-                    <span className="text-slate-400 block text-[11px]">Resolved At</span>
-                    <span className="font-semibold text-purple-700">
-                      {new Date(ticket.resolvedAt).toLocaleString()}
+                    <span className="text-zinc-400 text-[10px] uppercase tracking-wider block">Resolved</span>
+                    <span className="text-emerald-700 font-mono text-[11px] block mt-0.5">
+                      {new Date(ticket.resolvedAt).toLocaleString([], {
+                        dateStyle: 'medium',
+                        timeStyle: 'short',
+                      })}
                     </span>
                   </div>
                 )}
-
-                <div>
-                  <span className="text-slate-400 block text-[11px]">Last Updated</span>
-                  <span className="text-slate-600">
-                    {new Date(ticket.updatedAt).toLocaleString()}
-                  </span>
-                </div>
               </div>
             </div>
           </div>

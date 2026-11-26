@@ -7,41 +7,40 @@ interface StatusBadgeProps {
 }
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm' }) => {
-  const configs: Record<TicketStatus, { bg: string; text: string; dot: string; label: string }> = {
+  const configs: Record<
+    TicketStatus,
+    { label: string; dotClass: string; badgeClass: string }
+  > = {
     OPEN: {
-      bg: 'bg-emerald-50 border-emerald-200',
-      text: 'text-emerald-700',
-      dot: 'bg-emerald-500',
       label: 'Open',
+      dotClass: 'bg-blue-500',
+      badgeClass: 'bg-blue-50/70 text-blue-700 border-blue-200/60',
     },
     IN_PROGRESS: {
-      bg: 'bg-blue-50 border-blue-200',
-      text: 'text-blue-700',
-      dot: 'bg-blue-500',
       label: 'In Progress',
+      dotClass: 'bg-amber-500',
+      badgeClass: 'bg-amber-50/70 text-amber-800 border-amber-200/60',
     },
     RESOLVED: {
-      bg: 'bg-purple-50 border-purple-200',
-      text: 'text-purple-700',
-      dot: 'bg-purple-500',
       label: 'Resolved',
+      dotClass: 'bg-emerald-500',
+      badgeClass: 'bg-emerald-50/70 text-emerald-800 border-emerald-200/60',
     },
     CLOSED: {
-      bg: 'bg-slate-100 border-slate-300',
-      text: 'text-slate-600',
-      dot: 'bg-slate-400',
       label: 'Closed',
+      dotClass: 'bg-zinc-400',
+      badgeClass: 'bg-zinc-100/80 text-zinc-600 border-zinc-200/60',
     },
   };
 
   const c = configs[status] || configs.OPEN;
-  const padding = size === 'sm' ? 'px-2.5 py-0.5 text-xs' : 'px-3 py-1 text-sm';
+  const padding = size === 'sm' ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs';
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 font-medium rounded-full border ${c.bg} ${c.text} ${padding}`}
+      className={`inline-flex items-center gap-1.5 font-medium rounded-md border tracking-tight ${c.badgeClass} ${padding}`}
     >
-      <span className={`w-1.5 h-1.5 rounded-full ${c.dot}`} />
+      <span className={`w-1.5 h-1.5 rounded-full ${c.dotClass}`} />
       {c.label}
     </span>
   );

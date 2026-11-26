@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Role } from '../types';
-import { Ticket, ShieldAlert, UserCheck, Lock, Mail, User, AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2, ArrowRight } from 'lucide-react';
 
 export const AuthPage: React.FC = () => {
   const { login, register, switchDemoUser } = useAuth();
@@ -37,90 +37,80 @@ export const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="inline-flex w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-500 items-center justify-center text-white shadow-xl shadow-blue-500/30 mb-4">
-          <Ticket className="w-7 h-7" />
+    <div className="min-h-screen bg-[#fbfbfd] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        {/* Brand Icon */}
+        <div className="flex justify-center mb-4">
+          <div className="w-10 h-10 rounded-xl bg-zinc-900 text-white flex items-center justify-center shadow-sm">
+            <svg
+              className="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+              <path d="M13 5v2" />
+              <path d="M13 17v2" />
+              <path d="M13 11v2" />
+            </svg>
+          </div>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-          HelpDesk Pro
+
+        <h1 className="text-xl font-semibold text-center text-zinc-900 tracking-tight">
+          {isRegister ? 'Create an account' : 'Sign in to Support Desk'}
         </h1>
-        <p className="mt-2 text-sm text-slate-300">
-          Support Ticket Management & Event-Driven Helpdesk
+        <p className="mt-1 text-center text-xs text-zinc-500">
+          Event-driven helpdesk and ticket tracking system
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4">
-        <div className="bg-white py-8 px-6 sm:px-10 shadow-2xl rounded-2xl border border-slate-100">
-          {/* Quick Demo Logins Box */}
-          <div className="mb-6 p-4 rounded-xl bg-slate-50 border border-slate-200">
-            <span className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2.5">
-              ⚡ 1-Click Evaluation Accounts
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-[400px]">
+        <div className="bg-white py-7 px-6 sm:px-8 rounded-2xl border border-zinc-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)]">
+          {/* Quick Demo Switcher */}
+          <div className="mb-5 pb-5 border-b border-zinc-100">
+            <span className="text-[11px] font-medium text-zinc-400 block mb-2 uppercase tracking-wider">
+              Quick Test Accounts
             </span>
-            <div className="grid grid-cols-1 gap-2">
+            <div className="space-y-1.5">
               <button
                 type="button"
                 onClick={() => switchDemoUser('admin')}
-                className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg bg-white border border-purple-200 text-purple-900 hover:bg-purple-50 hover:border-purple-300 transition-all flex items-center justify-between shadow-sm"
+                className="w-full text-left px-3 py-2 rounded-lg bg-zinc-50 hover:bg-zinc-100/80 border border-zinc-200/60 transition-all flex items-center justify-between group"
               >
-                <div className="flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4 text-purple-600" />
-                  <span>Admin: Sarah Connor</span>
+                <div>
+                  <p className="text-xs font-medium text-zinc-800">Sarah Connor</p>
+                  <p className="text-[10px] text-zinc-400">Support Administrator</p>
                 </div>
-                <span className="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-mono">
-                  admin@helpdesk.com
-                </span>
+                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-700 transition-colors" />
               </button>
 
               <button
                 type="button"
                 onClick={() => switchDemoUser('john')}
-                className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg bg-white border border-emerald-200 text-emerald-900 hover:bg-emerald-50 hover:border-emerald-300 transition-all flex items-center justify-between shadow-sm"
+                className="w-full text-left px-3 py-2 rounded-lg bg-zinc-50 hover:bg-zinc-100/80 border border-zinc-200/60 transition-all flex items-center justify-between group"
               >
-                <div className="flex items-center gap-2">
-                  <UserCheck className="w-4 h-4 text-emerald-600" />
-                  <span>User 1: John Doe</span>
+                <div>
+                  <p className="text-xs font-medium text-zinc-800">John Doe</p>
+                  <p className="text-[10px] text-zinc-400">Standard Customer</p>
                 </div>
-                <span className="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-mono">
-                  john@example.com
-                </span>
+                <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-zinc-700 transition-colors" />
               </button>
-
-              <button
-                type="button"
-                onClick={() => switchDemoUser('alice')}
-                className="w-full text-left px-3 py-2 text-xs font-semibold rounded-lg bg-white border border-emerald-200 text-emerald-900 hover:bg-emerald-50 hover:border-emerald-300 transition-all flex items-center justify-between shadow-sm"
-              >
-                <div className="flex items-center gap-2">
-                  <UserCheck className="w-4 h-4 text-emerald-600" />
-                  <span>User 2: Alice Smith</span>
-                </div>
-                <span className="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-mono">
-                  alice@example.com
-                </span>
-              </button>
-            </div>
-          </div>
-
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-slate-200" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-slate-400 font-semibold">Or enter credentials</span>
             </div>
           </div>
 
           {/* Form Tabs */}
-          <div className="flex rounded-lg bg-slate-100 p-1 mb-5">
+          <div className="flex bg-zinc-100 p-0.5 rounded-lg mb-5 text-xs font-medium text-zinc-600">
             <button
               type="button"
               onClick={() => {
                 setIsRegister(false);
                 setError(null);
               }}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                !isRegister ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+              className={`flex-1 py-1 rounded-md transition-all ${
+                !isRegister ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-900'
               }`}
             >
               Sign In
@@ -131,79 +121,70 @@ export const AuthPage: React.FC = () => {
                 setIsRegister(true);
                 setError(null);
               }}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                isRegister ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+              className={`flex-1 py-1 rounded-md transition-all ${
+                isRegister ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-900'
               }`}
             >
-              Register New User
+              Register
             </button>
           </div>
 
           {error && (
-            <div className="mb-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+            <div className="mb-4 p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3.5">
             {isRegister && (
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
-                <div className="relative">
-                  <User className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    placeholder="e.g. John Doe"
-                    className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
+                <label className="block text-xs font-medium text-zinc-700 mb-1">Full name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  placeholder="e.g. Alex Morgan"
+                  className="w-full px-3 py-1.5 text-xs rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all placeholder:text-zinc-400"
+                />
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  placeholder="name@example.com"
-                  className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+              <label className="block text-xs font-medium text-zinc-700 mb-1">Email address</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="name@example.com"
+                className="w-full px-3 py-1.5 text-xs rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all placeholder:text-zinc-400"
+              />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Password</label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  placeholder="••••••••"
-                  className="w-full pl-9 pr-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+              <label className="block text-xs font-medium text-zinc-700 mb-1">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+                className="w-full px-3 py-1.5 text-xs rounded-lg border border-zinc-300 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all placeholder:text-zinc-400"
+              />
             </div>
 
             {isRegister && (
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Assign Role</label>
+                <label className="block text-xs font-medium text-zinc-700 mb-1">Role</label>
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value as Role)}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white font-medium focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-zinc-300 bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 font-medium"
                 >
-                  <option value="USER">Standard User (Raise & Track Tickets)</option>
-                  <option value="ADMIN">Administrator (Manage, Assign & Resolve)</option>
+                  <option value="USER">Customer (Submit & Track)</option>
+                  <option value="ADMIN">Administrator (Triage & Resolve)</option>
                 </select>
               </div>
             )}
@@ -211,15 +192,15 @@ export const AuthPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 py-2.5 px-4 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm shadow-blue-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full mt-2 py-2 px-4 text-xs font-medium text-white bg-zinc-900 hover:bg-zinc-800 active:scale-[0.99] rounded-lg shadow-sm transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
             >
               {loading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   <span>Processing...</span>
                 </>
               ) : (
-                <span>{isRegister ? 'Create Account' : 'Sign In'}</span>
+                <span>{isRegister ? 'Create Account' : 'Continue'}</span>
               )}
             </button>
           </form>

@@ -6,19 +6,19 @@ interface CategoryBadgeProps {
 }
 
 export const CategoryBadge: React.FC<CategoryBadgeProps> = ({ category }) => {
-  const configs: Record<Category, { label: string; bg: string }> = {
-    TECHNICAL: { label: 'Technical', bg: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
-    BILLING: { label: 'Billing', bg: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    ACCOUNT: { label: 'Account', bg: 'bg-cyan-50 text-cyan-700 border-cyan-200' },
-    FEATURE_REQUEST: { label: 'Feature Request', bg: 'bg-violet-50 text-violet-700 border-violet-200' },
-    GENERAL: { label: 'General', bg: 'bg-slate-50 text-slate-700 border-slate-200' },
+  const configs: Record<Category, { label: string }> = {
+    TECHNICAL: { label: 'Technical' },
+    BILLING: { label: 'Billing' },
+    ACCOUNT: { label: 'Account' },
+    FEATURE_REQUEST: { label: 'Feature Request' },
+    GENERAL: { label: 'General' },
   };
 
-  const c = configs[category] || configs.GENERAL;
+  const label = configs[category]?.label || 'General';
 
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs border font-medium ${c.bg}`}>
-      {c.label}
+    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium text-zinc-600 bg-white border border-zinc-200 shadow-[0_1px_1px_rgba(0,0,0,0.02)]">
+      {label}
     </span>
   );
 };
